@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/ball"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/ball"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/ball" />
+
+
+    <ImageView
+        android:id="@+id/left_btn"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        android:layout_marginLeft="32dp"
+        android:layout_marginBottom="50dp"
+        android:src="@drawable/left_arrow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+    <ImageView
+        android:id="@+id/right_btn"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        android:src="@drawable/right_arrow"
+        app:layout_constraintBottom_toBottomOf="@id/left_btn"
+        app:layout_constraintLeft_toRightOf="@id/left_btn"
+        android:layout_marginLeft="@dimen/button_size"/>
+    <ImageView
+        android:id="@+id/down_btn"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        app:layout_constraintTop_toBottomOf="@id/left_btn"
+        app:layout_constraintLeft_toRightOf="@id/left_btn"
+        android:src="@drawable/down_arrow"/>
+    <ImageView
+        android:id="@+id/up_btn"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        android:src="@drawable/up_arrow"
+        app:layout_constraintBottom_toTopOf="@id/left_btn"
+        app:layout_constraintLeft_toRightOf="@id/left_btn" />
+
+    <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/joystick"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24dp"
+        custom:JV_backgroundColor="#009688"
+        custom:JV_borderColor="#00796B"
+        custom:JV_borderWidth="4dp"
+        custom:JV_buttonColor="#FF6E40"
+        custom:JV_buttonSizeRatio="15%"
+        custom:JV_fixedCenter="false"
+        custom:layout_constraintTop_toTopOf="@id/up_btn"
+        custom:layout_constraintBottom_toBottomOf="@id/down_btn"
+        custom:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/action_btn"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        android:src="@drawable/x_button"
+        app:layout_constraintTop_toTopOf="@id/up_btn"
+        app:layout_constraintBottom_toBottomOf="@id/down_btn"
+        app:layout_constraintRight_toLeftOf="@id/joystick"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
