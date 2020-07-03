@@ -1,69 +1,94 @@
 package com.yehdua.exercise2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
+public class MainActivity extends AppCompatActivity{
 
 
-    private Runnable runnable;
-    private AnimationCalculator animationCalculator = new AnimationCalculator();
+    private BallViewModel ballViewModel;
+    private Animation bounceAnimation;
+    private int screenHeight, screenWidth;
+    private ImageView ball;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ballViewModel = new ViewModelProvider(this).get(BallViewModel.class);
+        bounceAnimation = AnimationUtils.loadAnimation(this, R.anim.bounce_animation);
         // set onClick listeners
+        initTouch();
 
-        findViewById(R.id.down_btn).setOnTouchListener(this);
-        findViewById(R.id.up_btn).setOnTouchListener(this);
-        findViewById(R.id.right_btn).setOnTouchListener(this);
-        findViewById(R.id.left_btn).setOnTouchListener(this);
-
-        initRunnable();
     }
+
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        findViewById(R.id.ball).post(runnable);
-    }
-
-    private void initRunnable(){
-        final View ball = findViewById(R.id.ball);
-        runnable = new Runnable() {
+        ball = findViewById(R.id.ball);
+        final View mainView = findViewById(R.id.main_view);
+        final AnimationUtilities animationUtilities = new AnimationUtilities(ballViewModel, ball);
+        animationUtilities.initAnimation(this);
+        mainView.post(new Runnable() {
+            // use a runnable to prevent the getMeasured from returning zero
             @Override
             public void run() {
-                float y = ball.getTranslationY() + animationCalculator.deltaY;
-                float x = ball.getTranslationX() + animationCalculator.deltaX;
-                ball.setTranslationY(y);
-                ball.setTranslationX(x);
-                ball.postDelayed(this, 16); // 60fps
+                int[] position = {0, 0};
+                mainView.getLocationOnScreen(position);
+                screenHeight = mainView.getMeasuredHeight() + position[1];
+                screenWidth = mainView.getMeasuredWidth() + position[0];
+                animationUtilities.setScreen(screenHeight, screenWidth);
             }
-        };
+        });
     }
 
-    public void onPause(){
+
+
+    public void onPause() {
         super.onPause();
-        findViewById(R.id.ball).removeCallbacks(runnable);
     }
-    @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                animationCalculator.moveBall(view.getId(), 1);
-                break;
-            case MotionEvent.ACTION_UP:
-                animationCalculator.moveBall(view.getId(), -1);
-                view.performClick();
-                break;
-            default:
-                break;
+
+    private void initTouch() {
+        final GestureDetector gestureDetector = new GestureDetector(this, new BallGestureListener());
+        findViewById(R.id.ball).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        ballViewModel.startX = motionEvent.getX();
+                        ballViewModel.startY = motionEvent.getY();
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        ballViewModel.velocityFromSwipe(motionEvent.getX(), motionEvent.getY());
+                        view.performClick();
+                        break;
+                }
+                return gestureDetector.onTouchEvent(motionEvent);
+            }
+        });
+
+    }
+
+    private class BallGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
         }
-        return true;
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+                ball.startAnimation(bounceAnimation);
+            return true;
+        }
     }
 
 }
