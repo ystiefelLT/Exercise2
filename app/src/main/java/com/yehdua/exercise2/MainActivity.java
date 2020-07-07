@@ -7,49 +7,42 @@ import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+
 import android.widget.ImageView;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     private BallViewModel ballViewModel;
-    private Animation bounceAnimation;
-    private int screenHeight, screenWidth;
-    private ImageView ball;
+    private InPlaceAnimationUtils inPlaceAnimationUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ballViewModel = new ViewModelProvider(this).get(BallViewModel.class);
-        bounceAnimation = AnimationUtils.loadAnimation(this, R.anim.bounce_animation);
         // set onClick listeners
+        initButtons();
         initTouch();
 
+    }
+
+    private void initButtons() {
+        findViewById(R.id.bounce_button).setOnClickListener(this);
+        findViewById(R.id.swap_button).setOnClickListener(this);
+        findViewById(R.id.spin_button).setOnClickListener(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ball = findViewById(R.id.ball);
-        final View mainView = findViewById(R.id.main_view);
-        final AnimationUtilities animationUtilities = new AnimationUtilities(ballViewModel, ball);
+        ImageView ball = findViewById(R.id.ball);
+        inPlaceAnimationUtils = new InPlaceAnimationUtils(ball);
+        final View mainView = findViewById(R.id.ball_frame);
+        final MoveAnimationUtils animationUtilities = new MoveAnimationUtils(ballViewModel, ball);
         animationUtilities.initAnimation(this);
-        mainView.post(new Runnable() {
-            // use a runnable to prevent the getMeasured from returning zero
-            @Override
-            public void run() {
-                int[] position = {0, 0};
-                mainView.getLocationOnScreen(position);
-                screenHeight = mainView.getMeasuredHeight() + position[1];
-                screenWidth = mainView.getMeasuredWidth() + position[0];
-                animationUtilities.setScreen(screenHeight, screenWidth);
-            }
-        });
+        mainView.post(animationUtilities.initScreen(mainView));
     }
-
 
 
     public void onPause() {
@@ -67,8 +60,11 @@ public class MainActivity extends AppCompatActivity{
                         ballViewModel.startY = motionEvent.getY();
                         break;
 
+                    case MotionEvent.ACTION_MOVE:
+                        ballViewModel.velocityFromMotion(motionEvent.getX(), motionEvent.getY());
+                        break;
                     case MotionEvent.ACTION_UP:
-                        ballViewModel.velocityFromSwipe(motionEvent.getX(), motionEvent.getY());
+                    case MotionEvent.ACTION_CANCEL:
                         view.performClick();
                         break;
                 }
@@ -86,9 +82,38 @@ public class MainActivity extends AppCompatActivity{
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-                ball.startAnimation(bounceAnimation);
+            inPlaceAnimationUtils.startBounce();
             return true;
         }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            inPlaceAnimationUtils.swapBalls();
+        }
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            ballViewModel.velocityFromSwipe(velocityX, velocityY);
+            return true;
+        }
+
     }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.bounce_button:
+                inPlaceAnimationUtils.startBounce();
+                break;
+            case R.id.spin_button:
+                inPlaceAnimationUtils.startSpin();
+                break;
+            case R.id.swap_button:
+                inPlaceAnimationUtils.swapBalls();
+                break;
+        }
+
+    }
+
+
+
 
 }

@@ -10,10 +10,15 @@ public class BallViewModel extends ViewModel {
     float startY = 0;
 
 
-    public void velocityFromSwipe(float stopX, float stopY) {
-        final float speedScale = 5;
+    public void velocityFromMotion(float stopX, float stopY) {
+        final float speedScale = 10;
         motionY.setValue((stopY - startY) * speedScale);
         motionX.setValue((stopX - startX) * speedScale);
+    }
+
+    public void velocityFromSwipe(float vx, float vy){
+        motionY.setValue(vy);
+        motionX.setValue(vx);
     }
 }
 

@@ -1,15 +1,19 @@
 package com.yehdua.exercise2;
 
+import android.content.Context;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 
+import androidx.annotation.IntDef;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-public class AnimationUtilities {
-
+public class MoveAnimationUtils {
 
     private BallViewModel ballViewModel;
     private int screenHeight, screenWidth;
@@ -18,14 +22,24 @@ public class AnimationUtilities {
     private final int BALL_OVER_SCREEN = -1;
     private final int BALL_ON_SCREEN = 0;
 
-    AnimationUtilities(BallViewModel ballViewModel, ImageView ball) {
+    MoveAnimationUtils(BallViewModel ballViewModel, ImageView ball) {
         this.ballViewModel = ballViewModel;
         this.ball = ball;
     }
 
-    public void setScreen(int height, int width) {
-        this.screenWidth = width;
-        this.screenHeight = height;
+
+    public Runnable initScreen(final View mainView){
+        final MoveAnimationUtils moveAnimationUtils = this;
+        return new Runnable() {
+            @Override
+            public void run() {
+                int[] position = {0, 0};
+                mainView.getLocationOnScreen(position);
+                moveAnimationUtils.screenHeight = mainView.getMeasuredHeight() + position[1];
+                moveAnimationUtils.screenWidth = mainView.getMeasuredWidth() + position[0];
+            }
+        };
+
     }
 
     private FlingAnimation genAnimation(
@@ -35,10 +49,11 @@ public class AnimationUtilities {
         flingAnimation
                 .setMinValue(-2000)
                 .setMaxValue(2000)
-                .setFriction(1f);
+                .setFriction(0.7f);
         ((DynamicAnimation) flingAnimation).addUpdateListener(updateListener);
         return flingAnimation;
     }
+
 
     private void setObserver(final FlingAnimation flingAnimation,
                              LifecycleOwner owner,
@@ -53,28 +68,16 @@ public class AnimationUtilities {
 
     public void initAnimation(LifecycleOwner owner) {
 
-        final FlingAnimation flingAnimationX = genAnimation(
+        FlingAnimation flingAnimationX = genAnimation(
                 DynamicAnimation.TRANSLATION_X, horizontalUpdate());
         setObserver(flingAnimationX, owner, ballViewModel.motionX);
 
-        final FlingAnimation flingAnimationY = genAnimation(
+        FlingAnimation flingAnimationY = genAnimation(
                 DynamicAnimation.TRANSLATION_Y, verticalUpdate());
         setObserver(flingAnimationY, owner, ballViewModel.motionY);
     }
 
-//    private FlingAnimation.OnAnimationUpdateListener flingUpdate(final int dimension, final int edge, final int ballSize, final MutableLiveData<Float> liveData) {
-//        return new FlingAnimation.OnAnimationUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(DynamicAnimation animation, float value, float velocity) {
-//                int[] location = {0, 0};
-//                ball.getLocationOnScreen(location);
-//                int ballDirection = ballOffScreen(location[dimension], edge, ballSize);
-//                if (ballDirection != BALL_ON_SCREEN) {
-//                    liveData.setValue(ballDirection * Math.abs(velocity));
-//                }
-//            }
-//        };
-//    }
+
     private FlingAnimation.OnAnimationUpdateListener horizontalUpdate() {
         return new FlingAnimation.OnAnimationUpdateListener() {
             @Override
@@ -112,5 +115,9 @@ public class AnimationUtilities {
             return BALL_ON_SCREEN;
         }
     }
+
+
+
+
 
 }
