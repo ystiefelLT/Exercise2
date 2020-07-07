@@ -1,10 +1,12 @@
-package com.yehdua.exercise2;
+package com.yehdua.exercise2.Utils;
 
 import android.content.Context;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+
+import com.yehdua.exercise2.R;
 
 public class InPlaceAnimationUtils {
 
@@ -25,6 +27,7 @@ public class InPlaceAnimationUtils {
         fadeInAnimation.setDuration(500);
         fadeOutAnimation.setAnimationListener(genAnimationListener(fadeInAnimation));
         ball.startAnimation(fadeOutAnimation);
+//        ball.animate().alpha(0).setDuration().withEndAction().
 
     }
 

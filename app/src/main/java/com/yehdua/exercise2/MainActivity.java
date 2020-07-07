@@ -10,6 +10,10 @@ import android.view.View;
 
 import android.widget.ImageView;
 
+import com.yehdua.exercise2.Utils.FlingAnimationUtils;
+import com.yehdua.exercise2.Utils.InPlaceAnimationUtils;
+import com.yehdua.exercise2.Utils.MoveAnimationUtils;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -39,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView ball = findViewById(R.id.ball);
         inPlaceAnimationUtils = new InPlaceAnimationUtils(ball);
         final View mainView = findViewById(R.id.ball_frame);
-        final MoveAnimationUtils animationUtilities = new MoveAnimationUtils(ballViewModel, ball);
+        final FlingAnimationUtils animationUtilities = new FlingAnimationUtils(ballViewModel, ball);
         animationUtilities.initAnimation(this);
         mainView.post(animationUtilities.initScreen(mainView));
     }
@@ -56,12 +60,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        ballViewModel.startX = motionEvent.getX();
-                        ballViewModel.startY = motionEvent.getY();
+                        ballViewModel.velocityFromSwipe(0, 0);
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        ballViewModel.velocityFromMotion(motionEvent.getX(), motionEvent.getY());
+                        MoveAnimationUtils.moveBall(view, motionEvent);
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onLongPress(MotionEvent e) {
+
             inPlaceAnimationUtils.swapBalls();
         }
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

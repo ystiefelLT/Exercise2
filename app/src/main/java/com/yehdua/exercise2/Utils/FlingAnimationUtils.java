@@ -1,19 +1,17 @@
-package com.yehdua.exercise2;
+package com.yehdua.exercise2.Utils;
 
-import android.content.Context;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 
-import androidx.annotation.IntDef;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-public class MoveAnimationUtils {
+import com.yehdua.exercise2.BallViewModel;
+
+public class FlingAnimationUtils {
 
     private BallViewModel ballViewModel;
     private int screenHeight, screenWidth;
@@ -22,14 +20,14 @@ public class MoveAnimationUtils {
     private final int BALL_OVER_SCREEN = -1;
     private final int BALL_ON_SCREEN = 0;
 
-    MoveAnimationUtils(BallViewModel ballViewModel, ImageView ball) {
+    public FlingAnimationUtils(BallViewModel ballViewModel, ImageView ball) {
         this.ballViewModel = ballViewModel;
         this.ball = ball;
     }
 
 
     public Runnable initScreen(final View mainView){
-        final MoveAnimationUtils moveAnimationUtils = this;
+        final FlingAnimationUtils moveAnimationUtils = this;
         return new Runnable() {
             @Override
             public void run() {
@@ -47,8 +45,8 @@ public class MoveAnimationUtils {
             FlingAnimation.OnAnimationUpdateListener updateListener) {
         FlingAnimation flingAnimation = new FlingAnimation(ball, translation);
         flingAnimation
-                .setMinValue(-2000)
-                .setMaxValue(2000)
+//                .setMinValue(-2000)
+//                .setMaxValue(2000)
                 .setFriction(0.7f);
         ((DynamicAnimation) flingAnimation).addUpdateListener(updateListener);
         return flingAnimation;
